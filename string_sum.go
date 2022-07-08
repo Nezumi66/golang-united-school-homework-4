@@ -2,6 +2,9 @@ package string_sum
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 //use these errors as appropriate, wrapping them with fmt.Errorf function
@@ -23,5 +26,52 @@ var (
 // Use the errors defined above as described, again wrapping into fmt.Errorf
 
 func StringSum(input string) (output string, err error) {
-	return "", nil
+	if len(input) == 0 {
+		return "", fmt.Errorf("<!-empty input-!>: %w", errorEmptyInput)
+	}
+
+	input = strings.ReplaceAll(input, " ", "")
+
+	offset := 0
+	var ops []int
+
+	for i := 1; i < len(input); i++ {
+		if input[i] == '-' || input[i] == '+' {
+			operand, err := getOperand(input[offset:i])
+			fmt.Printf("Final: %d\n", operand)
+			if err != nil {
+				return "", fmt.Errorf("<!-error-!>: %w", err)
+			}
+			ops = append(ops, operand)
+			offset = i
+		}
+		if i == len(input)-1 {
+			operand, err := getOperand(input[offset:len(input)])
+			fmt.Printf("Final: %d\n", operand)
+			if err != nil {
+				return "", fmt.Errorf("<!-error-!>: %w", err)
+			}
+			ops = append(ops, operand)
+		}
+	}
+	if len(ops) != 2 {
+		return "", fmt.Errorf("NoTwoOperands: %w", errorNotTwoOperands)
+	}
+	return strconv.Itoa(ops[0] + ops[1]), nil
+}
+func getOperand(op string) (int, error) {
+	fmt.Println("Initial: " + op)
+	neg := false
+	if op[0] == '-' {
+		neg = true
+	}
+	if neg == true {
+		operand, err := strconv.Atoi(op)
+		fmt.Printf("Exit: %d\n", operand)
+		return operand, err
+	} else {
+		operand, err := strconv.Atoi(op)
+		return operand, err
+	}
+	return 0, nil
 }
